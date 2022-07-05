@@ -27,6 +27,7 @@ admin_reload_interval = int(os.getenv("ADMIN_RELOAD_INTERVAL", 60))
 admins = []
 group_ids = [int(_id) for _id in os.getenv("GROUP_IDS", "").split()]
 admin_chat = int(os.getenv("ADMIN_CHAT_ID"))
+group_ids.append(admin_chat)
 
 async def update_admins():
     global admins
