@@ -31,16 +31,18 @@ admin_chat = int(os.getenv("ADMIN_CHAT_ID"))
 async def update_admins():
     global admins
     while True:
-        logger.info("Updating admins")
         while not bot.is_initialized:
             await asyncio.sleep(5)
-        async for chat_member in bot.get_chat_members(group_ids, filter=enums.chat_members_filter.ChatMembersFilter.ADMINISTRATORS):
+        for group_id in group_ids:
+            logger.info("Updating admins for Group ID: {}".format(group_id))
+            async for chat_member in bot.get_chat_members(group_id, filter=enums.chat_members_filter.ChatMembersFilter.ADMINISTRATORS):
                 if chat_member.user.is_bot:
                     continue
                 if chat_member.user.id in admins:
                     continue
                 logger.info(f"Adding {chat_member.user.first_name} to admin list")
                 admins.append(chat_member.user.id)
+            await asyncio.sleep(10)
         await asyncio.sleep(admin_reload_interval)
     
 async def start_bot():
