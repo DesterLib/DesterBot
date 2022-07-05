@@ -25,13 +25,14 @@ bot = Client(
 )
 
 admin_reload_interval = int(os.getenv("ADMIN_RELOAD_INTERVAL", 60))
-admins = []
+admin_list = []
 group_ids = [int(_id) for _id in os.getenv("GROUP_IDS", "").split()]
 admin_chat = int(os.getenv("ADMIN_CHAT_ID"))
 group_ids.append(admin_chat)
 
+
 async def update_admins():
-    global admins
+    global admin_list
     while True:
         while not bot.is_initialized:
             await asyncio.sleep(5)
@@ -40,10 +41,10 @@ async def update_admins():
                 async for chat_member in bot.get_chat_members(group_id, filter=enums.chat_members_filter.ChatMembersFilter.ADMINISTRATORS):
                     if chat_member.user.is_bot:
                         continue
-                    if chat_member.user.id in admins:
+                    if chat_member.user.id in admin_list:
                         continue
                     logger.info(f"Adding {chat_member.user.first_name} to admin list")
-                    admins.append(chat_member.user.id)
+                    admin_list.append(chat_member.user.id)
                 await asyncio.sleep(10)
             except ChannelInvalid:
                 logger.critical("Group ID {} is invalid or bot not added to Group".format(group_id))
@@ -55,8 +56,11 @@ async def start_bot():
     logger.info("Bot started")
     await idle()
 
-async def main():
-    await asyncio.gather(start_bot(), update_admins())
-
 if __name__ == '__main__':
-    asyncio.run(main())
+    try:
+        loop = asyncio.get_event_loop()
+        loop.create_task(update_admins())
+        loop.run_until_complete(start_bot())
+    except KeyboardInterrupt:
+        logger.info("Bot stopped")
+        quit()
