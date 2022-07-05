@@ -3,6 +3,7 @@ import logging
 import asyncio
 from dotenv import load_dotenv
 from pyrogram import Client, enums, idle
+from pyrogram.errors import ChannelInvalid
 
 logging.basicConfig(
     level=logging.INFO,
@@ -36,14 +37,18 @@ async def update_admins():
             await asyncio.sleep(5)
         for group_id in group_ids:
             logger.info("Updating admins for Group ID: {}".format(group_id))
-            async for chat_member in bot.get_chat_members(group_id, filter=enums.chat_members_filter.ChatMembersFilter.ADMINISTRATORS):
-                if chat_member.user.is_bot:
-                    continue
-                if chat_member.user.id in admins:
-                    continue
-                logger.info(f"Adding {chat_member.user.first_name} to admin list")
-                admins.append(chat_member.user.id)
-            await asyncio.sleep(10)
+            try:
+                async for chat_member in bot.get_chat_members(group_id, filter=enums.chat_members_filter.ChatMembersFilter.ADMINISTRATORS):
+                    if chat_member.user.is_bot:
+                        continue
+                    if chat_member.user.id in admins:
+                        continue
+                    logger.info(f"Adding {chat_member.user.first_name} to admin list")
+                    admins.append(chat_member.user.id)
+                await asyncio.sleep(10)
+            except ChannelInvalid:
+                logger.critical("Group ID {} is invalid or bot not added to Group".format(group_id))
+                exit(1)
         await asyncio.sleep(admin_reload_interval)
     
 async def start_bot():
