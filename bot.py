@@ -25,8 +25,7 @@ bot = Client(
 
 admin_reload_interval = int(os.getenv("ADMIN_RELOAD_INTERVAL", 60))
 admins = []
-group_ids = int(os.getenv("GROUP_IDS"))
-group_ids = [int(_id) for _id in group_ids.split()]
+group_ids = [int(_id) for _id in os.getenv("GROUP_IDS", "").split()]
 admin_chat = int(os.getenv("ADMIN_CHAT_ID"))
 
 async def update_admins():
