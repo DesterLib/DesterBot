@@ -26,9 +26,8 @@ bot = Client(
 
 admin_reload_interval = int(os.getenv("ADMIN_RELOAD_INTERVAL", 60))
 admin_list = []
-group_ids = [int(_id) for _id in os.getenv("GROUP_IDS", "").split()]
+group_id = int( os.getenv("GROUP_ID"))
 admin_chat = int(os.getenv("ADMIN_CHAT_ID"))
-group_ids.append(admin_chat)
 
 
 async def update_admins():
@@ -36,19 +35,17 @@ async def update_admins():
     while True:
         while not bot.is_initialized:
             await asyncio.sleep(5)
-        for group_id in group_ids:
-            try:
-                async for chat_member in bot.get_chat_members(group_id, filter=enums.chat_members_filter.ChatMembersFilter.ADMINISTRATORS):
-                    if chat_member.user.is_bot:
-                        continue
-                    if chat_member.user.id in admin_list:
-                        continue
-                    logger.info(f"Adding {chat_member.user.first_name} to admin list")
-                    admin_list.append(chat_member.user.id)
-                await asyncio.sleep(10)
-            except ChannelInvalid:
-                logger.critical("Group ID {} is invalid or bot not added to Group".format(group_id))
-                exit(1)
+        try:
+            async for chat_member in bot.get_chat_members(group_id, filter=enums.chat_members_filter.ChatMembersFilter.ADMINISTRATORS):
+                if chat_member.user.is_bot:
+                    continue
+                if chat_member.user.id in admin_list:
+                    continue
+                logger.info(f"Adding {chat_member.user.first_name} to admin list")
+                admin_list.append(chat_member.user.id)
+        except ChannelInvalid:
+            logger.critical("Group ID {} is invalid or bot not added to Group".format(group_id))
+            exit(1)
         await asyncio.sleep(admin_reload_interval)
     
 async def start_bot():

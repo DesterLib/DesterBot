@@ -1,6 +1,6 @@
 from pyrogram import Client, filters, emoji
 from pyrogram.types import ChatJoinRequest, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
-from bot import group_ids
+from bot import group_id
 
 welcome_txt = """
 <b>Hey there {mention},</b>
@@ -9,7 +9,7 @@ You'll have to follow some steps before joining our group.
 <b>Press the button</b> below to continue.
 """
 
-@Client.on_chat_join_request(filters.chat(group_ids))
+@Client.on_chat_join_request(filters.chat(group_id))
 async def chat_join_request_handler(c: Client, req: ChatJoinRequest):
     await c.send_message(req.from_user.id, welcome_txt.format(mention=req.from_user.mention),
                          reply_markup=InlineKeyboardMarkup(
@@ -20,7 +20,7 @@ async def chat_join_request_handler(c: Client, req: ChatJoinRequest):
 async def edit_welcome_message(c: Client, query: CallbackQuery):
     await query.answer()
     if query.matches[0].group(1) == "0":
-        await c.decline_chat_join_request(group_ids, query.from_user.id)
+        await c.decline_chat_join_request(group_id, query.from_user.id)
         txt = "Looks like you ain't fit for this group, have a nice day~"
         buttons = None
     elif query.matches[0].group(1) == "1":
@@ -37,7 +37,7 @@ async def edit_welcome_message(c: Client, query: CallbackQuery):
         ], [InlineKeyboardButton("Docs", url="dester.gq")]])
     elif query.matches[0].group(1) == "3":
         txt = open("strings/about_community.md", "r").read()
-        await c.approve_chat_join_request(group_ids, query.from_user.id)
+        await c.approve_chat_join_request(group_id, query.from_user.id)
         buttons = InlineKeyboardMarkup([[
             InlineKeyboardButton("Visit group", url="https://t.me/dester_community"),
             InlineKeyboardButton("Offtopic Chat", url="https://t.me/+HbStdsIn4yY2NTc0"),
