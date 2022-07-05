@@ -1,0 +1,6 @@
+httpx
+requests
+pyrogram
+pyrogram
+tgcrypto
+python-dotenv
