@@ -36,7 +36,6 @@ async def update_admins():
         while not bot.is_initialized:
             await asyncio.sleep(5)
         for group_id in group_ids:
-            logger.info("Updating admins for Group ID: {}".format(group_id))
             try:
                 async for chat_member in bot.get_chat_members(group_id, filter=enums.chat_members_filter.ChatMembersFilter.ADMINISTRATORS):
                     if chat_member.user.is_bot:
