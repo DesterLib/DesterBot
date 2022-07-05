@@ -1,6 +1,6 @@
 httpx
 requests
 pyrogram
-pyrogram
+git+https://github.com/EverythingSuckz/pyrogram
 tgcrypto
 python-dotenv
